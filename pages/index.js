@@ -11,6 +11,13 @@ const NATIONS = [
 ];
 const ZONES=[{id:0,label:"LEFT",arrow:"←"},{id:1,label:"CENTRE",arrow:"↑"},{id:2,label:"RIGHT",arrow:"→"}];
 const MULTS=[1.5,2.2,3.5,5.0,10.0];
+const W=500,H=460;
+const GL={l:162,r:338,top:58,bot:128};
+const GZW=(GL.r-GL.l)/3;
+const BS={x:250,y:232};
+const BD=[{x:192,y:92},{x:250,y:79},{x:308,y:92}];
+const KX=[202,250,298];
+const WU=500;
 const C={bg:"#04100A",card:"#0D1A0F",surf:"#0A1510",bdr:"#1A2E1C",gold:"#FFD700",grn:"#00D97E",red:"#E8453C",wht:"#F0EDE8",mut:"#4A6A4A"};
 
 function kick(pz){const kz=Math.floor(Math.random()*3);return{bz:pz,kz,scored:kz!==pz};}
@@ -67,6 +74,7 @@ function Intro({done}){
     </div>
   );
 }
+
 // ─── PITCH SVG (premium illustrated) ─────────────────────────────────────────
 function PitchSVG({ kickerTeam, keeperTeam, ph, sz, kzone, anim, bx, by, pw, pot, rip }) {
   const ka=(ph==="windup"||ph==="animating")?sz===0?-13:sz===2?13:0:0;
@@ -107,6 +115,11 @@ function PitchSVG({ kickerTeam, keeperTeam, ph, sz, kzone, anim, bx, by, pw, pot
         </pattern>
         <linearGradient id="cfl" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="#020808"/></linearGradient>
         <clipPath id="pc"><polygon points={"0,"+H+" "+W+","+H+" 425,"+GL.bot+" 75,"+GL.bot}/></clipPath>
+        {/* Jersey pattern */}
+        <pattern id="jp" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="12" height="12" fill="none"/>
+          <rect width="6" height="12" fill="rgba(0,0,0,0.18)"/>
+        </pattern>
       </defs>
 
       {/* SKY */}
@@ -382,6 +395,7 @@ function PitchSVG({ kickerTeam, keeperTeam, ph, sz, kzone, anim, bx, by, pw, pot
     </svg>
   );
 }
+
 export default function Penalty5(){
   const [intro,setIntro]=useState(true);
   const [scr,setScr]=useState("matchup");
@@ -398,8 +412,11 @@ export default function Penalty5(){
   const [out,setOut]=useState(null);
   const [ct,setCt]=useState(5);
   const [pw,setPw]=useState(0);
+  const [bx,setBx]=useState(BS.x);
+  const [by,setBy]=useState(BS.y);
   const [kzone,setKzone]=useState(1);
   const [anim,setAnim]=useState(false);
+  const [rip,setRip]=useState(false);
 
   const knR=useRef(1),potR=useRef(0),betR=useRef(100),logR=useRef([]);
   const tR=useRef(null),coR=useRef(null),bbR=useRef(null);
@@ -416,13 +433,14 @@ export default function Penalty5(){
     setPh("animating");setAnim(true);
     const r=kick(pz);
     setKzone(r.kz);
+    setTimeout(() => { setBx(BD[pz].x); setBy(BD[pz].y); }, 80);
     setTimeout(()=>{
       setAnim(false);
       const n=knR.current,b=betR.current;
       const np=r.scored?Math.round(b*MULTS[n-1]):0;
       const nl=[...logR.current,{...r,kn:n}];
       logR.current=nl;setLog(nl);
-      if(r.scored){potR.current=np;setPot(np);}
+      if(r.scored){potR.current=np;setPot(np);setRip(true);setTimeout(()=>setRip(false),1000);}
       setOut({...r,kn:n,pot:np});setPh("showing");
       if(!r.scored){potR.current=0;setPot(0);setTimeout(()=>{setRes("saved");setFp(0);setScr("summary");},2500);}
       else if(n>=5){setTimeout(()=>{setRes("done");setFp(np);setScr("summary");},2100);}
@@ -434,7 +452,7 @@ export default function Penalty5(){
   },[]);
 
   const startBet=useCallback(()=>{
-    setKzone(1);setSz(null);setOut(null);setAnim(false);setPw(0);
+    setBx(BS.x); setBy(BS.y); setKzone(1); setSz(null); setOut(null); setAnim(false); setPw(0); setRip(false);
     setPh("betting");let t=5;setBt(t);
     tR.current=setInterval(()=>{t--;setBt(t);if(t<=0){clearInterval(tR.current);doKick(null);}},1000);
   },[doKick]);
@@ -643,6 +661,7 @@ export default function Penalty5(){
         html,body{background:#04100A!important;margin:0;padding:0}
         @keyframes dp{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
         @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+        @keyframes rp{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
         button:active{transform:scale(0.97)}
         *{box-sizing:border-box}
       `}</style>
