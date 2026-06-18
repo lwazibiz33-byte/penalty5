@@ -84,7 +84,88 @@ function Intro({done}){
     </div>
   );
 }
+// ─── 3D PITCH COMPONENT ────────────────────────────────────────────────────
+function Pitch3D({ kickerTeam, keeperTeam, ph, sz, kzone, anim, bx, by, pw, rip }) {
+  const ballX3 = ((bx - 250) / 250) * 6;
+  const ballY3 = 3.5 - ((by - 80) / 150) * 3;
+  const keeperX3 = ((KX[kzone] - 250) / 250) * 4.5;
 
+  return (
+    <group>
+      {/* Pitch */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, -2]}>
+        <planeGeometry args={[10, 12]} />
+        <meshStandardMaterial color="#1A5C1A" />
+      </mesh>
+
+      {/* Goal */}
+      <group position={[0, 1.8, -5.5]}>
+        <mesh position={[-2, 0, 0]}>
+          <boxGeometry args={[0.15, 1.5, 0.15]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+        <mesh position={[2, 0, 0]}>
+          <boxGeometry args={[0.15, 1.5, 0.15]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+        <mesh position={[0, 0.75, 0]}>
+          <boxGeometry args={[4.15, 0.15, 0.15]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+        <mesh position={[0, 0.4, -0.8]}>
+          <planeGeometry args={[3.9, 1.2]} />
+          <meshStandardMaterial color="rgba(255,255,255,0.15)" side={2} />
+        </mesh>
+      </group>
+
+      {/* Keeper */}
+      <group position={[keeperX3, 0.3, -4.8]}>
+        <mesh position={[0, 0.6, 0]}>
+          <capsuleGeometry args={[0.3, 0.8]} />
+          <meshStandardMaterial color={keeperTeam.color} />
+        </mesh>
+        <mesh position={[0, 1.2, 0]}>
+          <sphereGeometry args={[0.25]} />
+          <meshStandardMaterial color={keeperTeam.skin} />
+        </mesh>
+        <mesh position={[-0.35, 0.9, 0]}>
+          <sphereGeometry args={[0.15]} />
+          <meshStandardMaterial color="#FFD700" />
+        </mesh>
+        <mesh position={[0.35, 0.9, 0]}>
+          <sphereGeometry args={[0.15]} />
+          <meshStandardMaterial color="#FFD700" />
+        </mesh>
+      </group>
+
+      {/* Kicker */}
+      <group position={[0, -0.3, 2.5]}>
+        <mesh position={[0, 0.7, 0]}>
+          <capsuleGeometry args={[0.32, 0.9]} />
+          <meshStandardMaterial color={kickerTeam.color} />
+        </mesh>
+        <mesh position={[0, 1.35, 0]}>
+          <sphereGeometry args={[0.25]} />
+          <meshStandardMaterial color={kickerTeam.skin} />
+        </mesh>
+        <mesh position={[-0.15, 0.15, 0]}>
+          <capsuleGeometry args={[0.12, 0.5]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+        <mesh position={[0.15, 0.15, 0]}>
+          <capsuleGeometry args={[0.12, 0.5]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+      </group>
+
+      {/* Ball */}
+      <mesh position={[ballX3, ballY3, (by > 200 ? 2 : -3)]}>
+        <sphereGeometry args={[0.25]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+    </group>
+  );
+}
 // ════════════════════════════════════════════════════════════════════════════
 export default function Penalty5(){
   const [intro,setIntro]=useState(true);
