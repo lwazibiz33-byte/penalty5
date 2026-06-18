@@ -67,7 +67,321 @@ function Intro({done}){
     </div>
   );
 }
+// ─── PITCH SVG (premium illustrated) ─────────────────────────────────────────
+function PitchSVG({ kickerTeam, keeperTeam, ph, sz, kzone, anim, bx, by, pw, pot, rip }) {
+  const ka=(ph==="windup"||ph==="animating")?sz===0?-13:sz===2?13:0:0;
+  const kx=KX[kzone];
+  const kc=keeperTeam.color, kt2=keeperTeam.kit;
+  const tc=kickerTeam.color, td=kickerTeam.dark, tk=kickerTeam.kit, ts=kickerTeam.skin;
+  const cc=kickerTeam.crowd, ac=keeperTeam.crowd;
 
+  // Generate simple crowd rows
+  const crowdL = [], crowdR = [];
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 13; col++) {
+      const x = col * 19 + (row % 2 === 0 ? 0 : 9);
+      const y = row * 11 + 3;
+      if (x < 248) crowdL.push({ x: x + 4, y, flag: col % 5 === 2 && row % 2 === 0 });
+    }
+    for (let col = 0; col < 13; col++) {
+      const x = 252 + col * 19 + (row % 2 === 0 ? 0 : 9);
+      const y = row * 11 + 3;
+      if (x < 500) crowdR.push({ x, y, flag: col % 5 === 2 && row % 2 === 0 });
+    }
+  }
+
+  return (
+    <svg viewBox={"0 0 "+W+" "+H} style={{width:"100%",display:"block"}}>
+      <defs>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#020808"/><stop offset="100%" stopColor="#0A1A0C"/></linearGradient>
+        <linearGradient id="pd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1E4020"/><stop offset="100%" stopColor="#0A1A0C"/></linearGradient>
+        <linearGradient id="pl" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1A3A1C"/><stop offset="100%" stopColor="#091408"/></linearGradient>
+        <radialGradient id="fl" cx="50%" cy="5%" r="65%"><stop offset="0%" stopColor="rgba(255,255,220,0.1)"/><stop offset="100%" stopColor="rgba(0,0,0,0)"/></radialGradient>
+        <radialGradient id="lfl" cx="10%" cy="5%" r="35%"><stop offset="0%" stopColor="rgba(255,255,220,0.2)"/><stop offset="100%" stopColor="rgba(0,0,0,0)"/></radialGradient>
+        <radialGradient id="rfl" cx="90%" cy="5%" r="35%"><stop offset="0%" stopColor="rgba(255,255,220,0.2)"/><stop offset="100%" stopColor="rgba(0,0,0,0)"/></radialGradient>
+        <radialGradient id="vg" cx="50%" cy="50%" r="65%"><stop offset="55%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="rgba(0,0,0,0.5)"/></radialGradient>
+        <radialGradient id="gg" cx="50%" cy="100%" r="65%"><stop offset="0%" stopColor="rgba(0,200,100,0.35)"/><stop offset="100%" stopColor="rgba(0,0,0,0)"/></radialGradient>
+        <pattern id="nt" x="0" y="0" width="11" height="9" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="11" y2="0" stroke="rgba(255,255,255,0.14)" strokeWidth="0.7"/>
+          <line x1="0" y1="0" x2="0" y2="9" stroke="rgba(255,255,255,0.14)" strokeWidth="0.7"/>
+        </pattern>
+        <linearGradient id="cfl" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="#020808"/></linearGradient>
+        <clipPath id="pc"><polygon points={"0,"+H+" "+W+","+H+" 425,"+GL.bot+" 75,"+GL.bot}/></clipPath>
+      </defs>
+
+      {/* SKY */}
+      <rect x="0" y="0" width={W} height={GL.bot} fill="url(#skyG)"/>
+
+      {/* FLOODLIGHTS */}
+      <rect x="0" y="0" width={W} height={GL.bot} fill="url(#lfl)"/>
+      <rect x="0" y="0" width={W} height={GL.bot} fill="url(#rfl)"/>
+      <rect x="0" y="0" width={W} height={GL.bot} fill="url(#fl)"/>
+      {/* Floodlight poles */}
+      <rect x="18" y="0" width="6" height="45" fill="#1A2A1C"/>
+      <rect x="15" y="0" width="12" height="8" rx="2" fill="#FFD700" opacity="0.8"/>
+      <rect x="476" y="0" width="6" height="45" fill="#1A2A1C"/>
+      <rect x="473" y="0" width="12" height="8" rx="2" fill="#FFD700" opacity="0.8"/>
+
+      {/* CROWD - LEFT (home/kicker team color) */}
+      {crowdL.map((p,i)=>(
+        p.flag ?
+          <g key={i}>
+            <rect x={p.x-6} y={p.y-1} width={14} height={9} fill={tc} rx="1" opacity="0.8"/>
+            <rect x={p.x-6} y={p.y-1} width={4} height={9} fill={td} rx="1" opacity="0.7"/>
+          </g> :
+          <ellipse key={i} cx={p.x} cy={p.y+4} rx="5.5" ry="5" fill={cc} opacity="0.75"/>
+      ))}
+      {/* Crowd heads detail left */}
+      {crowdL.filter(p=>!p.flag).slice(0,20).map((p,i)=>(
+        <circle key={"h"+i} cx={p.x} cy={p.y+2} r="3" fill={kickerTeam.skin} opacity="0.5"/>
+      ))}
+
+      {/* CROWD - RIGHT (away/keeper team color) */}
+      {crowdR.map((p,i)=>(
+        p.flag ?
+          <g key={i}>
+            <rect x={p.x-6} y={p.y-1} width={14} height={9} fill={kc} rx="1" opacity="0.8"/>
+          </g> :
+          <ellipse key={i} cx={p.x} cy={p.y+4} rx="5.5" ry="5" fill={ac} opacity="0.75"/>
+      ))}
+      {crowdR.filter(p=>!p.flag).slice(0,20).map((p,i)=>(
+        <circle key={"h"+i} cx={p.x} cy={p.y+2} r="3" fill={keeperTeam.skin} opacity="0.5"/>
+      ))}
+
+      {/* Crowd fade to pitch */}
+      <rect x="0" y="44" width={W} height={18} fill="url(#cfl)"/>
+
+      {/* ADVERTISING BOARDS */}
+      <rect x="0" y="58" width={W} height={11} fill="#111A12"/>
+      <rect x="0" y="58" width={130} height={11} fill={td}/>
+      <rect x={370} y="58" width={130} height={11} fill={kc}/>
+      <text x="65" y="67" textAnchor="middle" fontSize="7" fill="white" fontWeight="900" letterSpacing="1">PENALTY 5</text>
+      <text x="250" y="67" textAnchor="middle" fontSize="6" fill="rgba(255,255,255,0.65)" fontWeight="700" letterSpacing="3">SENEZO MEDIA GROUP</text>
+      <text x="435" y="67" textAnchor="middle" fontSize="7" fill="white" fontWeight="900" letterSpacing="1">AFRICA CUP 🏆</text>
+
+      {/* NET RIPPLE */}
+      {rip && <rect x={GL.l} y={GL.top} width={GL.r-GL.l} height={GL.bot-GL.top} fill="url(#gg)" style={{animation:"rp 1s ease-out"}}/>}
+
+      {/* NET */}
+      <rect x={GL.l} y={GL.top} width={GL.r-GL.l} height={GL.bot-GL.top} fill="url(#nt)"/>
+      <rect x={GL.l} y={GL.top} width={GL.r-GL.l} height={GL.bot-GL.top} fill="rgba(0,0,0,0.42)"/>
+
+      {/* ZONE AIM HIGHLIGHTS */}
+      {(ph==="betting"||ph==="windup")&&sz!==null&&(
+        <rect x={GL.l+sz*GZW} y={GL.top} width={GZW} height={GL.bot-GL.top} fill={tc+"50"} stroke={tc} strokeWidth="2" strokeDasharray={ph==="betting"?"4,3":"none"}/>
+      )}
+      {[1,2].map(i=><line key={i} x1={GL.l+i*GZW} y1={GL.top} x2={GL.l+i*GZW} y2={GL.bot} stroke="rgba(255,255,255,0.08)" strokeWidth="0.8"/>)}
+
+      {/* GOAL POSTS */}
+      <rect x={GL.l} y={GL.top} width={12} height={GL.bot-GL.top} fill="rgba(0,0,0,0.25)"/>
+      <rect x={GL.r-12} y={GL.top} width={12} height={GL.bot-GL.top} fill="rgba(0,0,0,0.25)"/>
+      <rect x={GL.l-3} y={GL.top-2} width={6} height={GL.bot-GL.top+4} rx="2" fill="white"/>
+      <rect x={GL.r-3} y={GL.top-2} width={6} height={GL.bot-GL.top+4} rx="2" fill="white"/>
+      <rect x={GL.l-3} y={GL.top-2} width={GL.r-GL.l+6} height={6} rx="2" fill="white"/>
+      {/* Post shadow depth */}
+      <rect x={GL.l+3} y={GL.top} width={4} height={GL.bot-GL.top} fill="rgba(0,0,0,0.15)"/>
+      <rect x={GL.r-7} y={GL.top} width={4} height={GL.bot-GL.top} fill="rgba(0,0,0,0.15)"/>
+
+      {/* ── GOALKEEPER ── */}
+      <g style={{transform:"translateX("+(kx-250)+"px)",transition:anim?"transform 0.36s cubic-bezier(0.34,1.56,0.64,1)":"none"}}>
+        {/* Legs */}
+        <rect x="241" y="106" width="9" height="16" rx="4" fill={kc}/>
+        <rect x="250" y="106" width="9" height="16" rx="4" fill={kc}/>
+        {/* Boots */}
+        <path d="M 237,122 Q 234,127 244,128 Q 251,128 251,124 L 251,121 Z" fill="#111"/>
+        <path d="M 251,121 L 251,124 Q 251,128 258,128 Q 266,127 263,122 Z" fill="#111"/>
+        {/* Body */}
+        <rect x="235" y="80" width="30" height="28" rx="7" fill={kc}/>
+        {/* Number */}
+        <text x="250" y="101" textAnchor="middle" fontSize="12" fill={kt2} fontWeight="900">1</text>
+        {/* Arms spread */}
+        <path d="M 235,91 Q 215,88 200,85" stroke={kc} strokeWidth="11" strokeLinecap="round" fill="none"/>
+        <path d="M 265,91 Q 285,88 300,85" stroke={kc} strokeWidth="11" strokeLinecap="round" fill="none"/>
+        {/* Forearm skin */}
+        <path d="M 208,86 Q 202,84 198,83" stroke={keeperTeam.skin} strokeWidth="8" strokeLinecap="round" fill="none"/>
+        <path d="M 292,86 Q 298,84 302,83" stroke={keeperTeam.skin} strokeWidth="8" strokeLinecap="round" fill="none"/>
+        {/* Gloves */}
+        <ellipse cx="196" cy="82" rx="9" ry="7" fill="#FFD700"/>
+        <ellipse cx="304" cy="82" rx="9" ry="7" fill="#FFD700"/>
+        {/* Glove fingers */}
+        {[-3,-1,1,3].map((dx,i)=><line key={i} x1={195+dx} y1="78" x2={195+dx} y2="74" stroke="#C8A000" strokeWidth="1.8" strokeLinecap="round"/>)}
+        {[-3,-1,1,3].map((dx,i)=><line key={i} x1={305+dx} y1="78" x2={305+dx} y2="74" stroke="#C8A000" strokeWidth="1.8" strokeLinecap="round"/>)}
+        {/* Head */}
+        <circle cx="250" cy="73" r="13" fill={keeperTeam.skin}/>
+        {/* Hair */}
+        <path d={"M 237,73 Q 237,61 250,60 Q 263,61 263,73 Q 260,64 250,63 Q 240,64 237,73 Z"} fill="#1A0A00"/>
+        {/* Eyes */}
+        <ellipse cx="245" cy="73" rx="2.8" ry="2.2" fill="white"/>
+        <ellipse cx="255" cy="73" rx="2.8" ry="2.2" fill="white"/>
+        <circle cx="245" cy="73" r="1.4" fill="#1A1A1A"/>
+        <circle cx="255" cy="73" r="1.4" fill="#1A1A1A"/>
+        {/* Eyebrows */}
+        <path d="M 242,70 Q 245,68 248,70" stroke="#1A0A00" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M 252,70 Q 255,68 258,70" stroke="#1A0A00" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      </g>
+
+      {/* PITCH SURFACE */}
+      {[0,1,2,3,4].map(i=>(
+        <polygon key={i} points={(i*100)+","+H+" "+(i*100+100)+","+H+" "+(75+(i+1)*70)+","+GL.bot+" "+(75+i*70)+","+GL.bot} fill={i%2===0?"url(#pd)":"url(#pl)"} clipPath="url(#pc)"/>
+      ))}
+
+      {/* PITCH MARKINGS */}
+      <line x1="0" y1={H} x2="75" y2={GL.bot} stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
+      <line x1={W} y1={H} x2="425" y2={GL.bot} stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
+      <line x1="75" y1={GL.bot} x2="425" y2={GL.bot} stroke="rgba(255,255,255,0.3)" strokeWidth="1.2"/>
+      <line x1="75" y1={GL.bot} x2="46" y2={GL.bot+32} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <line x1="425" y1={GL.bot} x2="454" y2={GL.bot+32} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <line x1="46" y1={GL.bot+32} x2="454" y2={GL.bot+32} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <line x1={GL.l+12} y1={GL.bot} x2={GL.l+8} y2={GL.bot+14} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <line x1={GL.r-12} y1={GL.bot} x2={GL.r-8} y2={GL.bot+14} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <line x1={GL.l+8} y1={GL.bot+14} x2={GL.r-8} y2={GL.bot+14} stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <path d={"M 198,"+(GL.bot+32)+" Q 250,"+(GL.bot+24)+" 302,"+(GL.bot+32)} stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="none"/>
+      <circle cx="250" cy="236" r="4" fill="rgba(255,255,255,0.6)"/>
+      <circle cx="250" cy="236" r="2" fill="white"/>
+      <line x1="250" y1={H} x2="250" y2={GL.bot} stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="10,10"/>
+
+      {/* BALL */}
+      <g style={{transform:"translate("+bx+"px,"+by+"px)",transition:anim?"transform 0.7s cubic-bezier(0.2,0,0.55,1)":"none"}}>
+        <circle r="9.5" fill="white" stroke="rgba(0,0,0,0.2)" strokeWidth="0.5"/>
+        <path d="M 0,-9.5 Q 5,-5 5,0 Q 5,5 0,9.5 Q -5,5 -5,0 Q -5,-5 0,-9.5 Z" fill="rgba(0,0,0,0.1)"/>
+        <path d="M -9.5,0 Q -5,-5 0,-5 Q 5,-5 9.5,0 Q 5,5 0,5 Q -5,5 -9.5,0 Z" fill="rgba(0,0,0,0.08)"/>
+        <circle r="4" fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="0.8"/>
+      </g>
+
+      {/* ── KICKER PLAYER (illustrated) ── */}
+      <g style={{transformOrigin:"250px 452px",transform:"rotate("+ka+"deg)",transition:"transform 0.32s cubic-bezier(0.34,1.56,0.64,1)"}}>
+        {/* Ground shadow */}
+        <ellipse cx="250" cy="452" rx="42" ry="7" fill="rgba(0,0,0,0.55)"/>
+
+        {/* === BOOTS === */}
+        <path d="M 226,435 Q 222,440 212,441 Q 206,441 205,438 Q 204,434 209,432 L 226,432 Z" fill="#111"/>
+        <path d="M 274,435 Q 278,440 288,441 Q 294,441 295,438 Q 296,434 291,432 L 274,432 Z" fill="#111"/>
+        {/* Boot highlight */}
+        <path d="M 209,434 Q 215,433 222,434" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M 278,434 Q 284,433 291,434" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        {/* Studs hint */}
+        {[-3,0,3].map((dx,i)=><circle key={i} cx={213+dx} cy="440" r="1.2" fill="#222" opacity="0.6"/>)}
+        {[-3,0,3].map((dx,i)=><circle key={i} cx={287+dx} cy="440" r="1.2" fill="#222" opacity="0.6"/>)}
+
+        {/* === SOCKS === */}
+        {/* Left sock */}
+        <path d="M 224,405 L 236,405 L 236,434 L 224,432 Z" fill="white"/>
+        <rect x="224" y="405" width="12" height="6" rx="0" fill={tc}/>
+        <line x1="224" y1="415" x2="236" y2="415" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+        <line x1="224" y1="422" x2="236" y2="422" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+        {/* Right sock */}
+        <path d="M 264,405 L 276,405 L 276,432 L 264,434 Z" fill="white"/>
+        <rect x="264" y="405" width="12" height="6" rx="0" fill={tc}/>
+        <line x1="264" y1="415" x2="276" y2="415" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+        <line x1="264" y1="422" x2="276" y2="422" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+
+        {/* === LEGS (skin) === */}
+        <path d="M 222,374 L 237,374 L 236,405 L 222,405 Z" fill={ts}/>
+        <path d="M 263,374 L 278,374 L 278,405 L 264,405 Z" fill={ts}/>
+        {/* Knee highlight */}
+        <ellipse cx="230" cy="390" rx="6" ry="5" fill={ts} opacity="0.7"/>
+        <ellipse cx="270" cy="390" rx="6" ry="5" fill={ts} opacity="0.7"/>
+
+        {/* === SHORTS === */}
+        <path d="M 220,350 L 280,350 L 282,370 L 264,374 L 256,358 L 244,358 L 236,374 L 218,370 Z" fill={td}/>
+        {/* Shorts side stripe */}
+        <path d="M 221,352 L 234,352 L 233,360 L 220,358 Z" fill={tc} opacity="0.5"/>
+        <path d="M 279,352 L 266,352 L 267,360 L 280,358 Z" fill={tc} opacity="0.5"/>
+
+        {/* === JERSEY MAIN BODY === */}
+        <path d={"M 216,290 L 284,290 L 280,350 L 220,350 Z"} fill={tc}/>
+        {/* Jersey texture overlay */}
+        <path d={"M 216,290 L 284,290 L 280,350 L 220,350 Z"} fill="url(#jp)"/>
+        {/* Jersey side panels */}
+        <path d="M 216,290 L 222,350 L 226,350 L 220,300 Z" fill={td} opacity="0.5"/>
+        <path d="M 284,290 L 278,350 L 274,350 L 280,300 Z" fill={td} opacity="0.5"/>
+
+        {/* === SLEEVES === */}
+        <path d="M 216,290 L 197,302 L 195,325 L 210,332 L 216,314 L 220,298 Z" fill={tc}/>
+        <path d="M 284,290 L 303,302 L 305,325 L 290,332 L 284,314 L 280,298 Z" fill={tc}/>
+        {/* Sleeve texture */}
+        <path d="M 216,290 L 197,302 L 195,325 L 210,332 L 216,314 L 220,298 Z" fill="url(#jp)"/>
+        <path d="M 284,290 L 303,302 L 305,325 L 290,332 L 284,314 L 280,298 Z" fill="url(#jp)"/>
+        {/* Sleeve cuffs */}
+        <path d="M 195,325 L 210,332 L 210,328 L 196,322 Z" fill={td}/>
+        <path d="M 305,325 L 290,332 L 290,328 L 304,322 Z" fill={td}/>
+
+        {/* Jersey collar */}
+        <path d="M 240,289 Q 250,283 260,289 L 258,295 Q 250,293 242,295 Z" fill={td}/>
+
+        {/* Jersey name */}
+        <text x="250" y="312" textAnchor="middle" fontSize="9.5" fill={tk} fontWeight="800" letterSpacing="2.5" opacity="0.92">{kickerTeam.name.toUpperCase()}</text>
+
+        {/* Jersey number - LARGE hero element */}
+        <text x="250" y="344" textAnchor="middle" fontSize="34" fill={tk} fontWeight="900" opacity="0.95">10</text>
+
+        {/* === ARMS === */}
+        <path d="M 195,325 Q 190,344 192,360" stroke={ts} strokeWidth="15" strokeLinecap="round" fill="none"/>
+        <path d="M 305,325 Q 310,344 308,360" stroke={ts} strokeWidth="15" strokeLinecap="round" fill="none"/>
+        {/* Wrist hands */}
+        <ellipse cx="192" cy="362" rx="7" ry="6" fill={ts}/>
+        <ellipse cx="308" cy="362" rx="7" ry="6" fill={ts}/>
+
+        {/* === NECK === */}
+        <path d="M 244,283 L 256,283 L 254,270 L 246,270 Z" fill={ts}/>
+        {/* Collar line */}
+        <path d="M 244,283 Q 250,280 256,283" stroke={td} strokeWidth="1.5" fill="none"/>
+
+        {/* === HEAD === */}
+        <circle cx="250" cy="258" r="22" fill={ts}/>
+        {/* Head shading */}
+        <ellipse cx="244" cy="262" rx="10" ry="12" fill="rgba(0,0,0,0.06)"/>
+
+        {/* Hair */}
+        <path d={"M 228,258 Q 228,236 250,234 Q 272,236 272,258 Q 268,242 250,240 Q 232,242 228,258 Z"} fill="#100800"/>
+        {/* Hair texture lines */}
+        <path d="M 232,252 Q 236,246 242,244 Q 248,242 254,243" stroke="#1E1000" strokeWidth="1" fill="none" opacity="0.6" strokeLinecap="round"/>
+        <path d="M 230,258 Q 233,252 238,249" stroke="#1E1000" strokeWidth="1" fill="none" opacity="0.4" strokeLinecap="round"/>
+        {/* Fade cut line */}
+        <path d="M 228,262 Q 229,258 232,256" stroke={ts} strokeWidth="1.5" fill="none" opacity="0.4"/>
+        <path d="M 272,262 Q 271,258 268,256" stroke={ts} strokeWidth="1.5" fill="none" opacity="0.4"/>
+
+        {/* Left ear */}
+        <ellipse cx="228" cy="260" rx="5.5" ry="7" fill={ts}/>
+        <ellipse cx="228" cy="260" rx="3" ry="4.5" fill={ts} stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+        {/* Right ear */}
+        <ellipse cx="272" cy="260" rx="5.5" ry="7" fill={ts}/>
+        <ellipse cx="272" cy="260" rx="3" ry="4.5" fill={ts} stroke="rgba(0,0,0,0.08)" strokeWidth="0.8"/>
+
+        {/* Windup power bar */}
+        {ph==="windup"&&(
+          <>
+            <text x="250" y={H-20} textAnchor="middle" fontSize="8.5" fill={tc} fontWeight="900" letterSpacing="2">WINDING UP</text>
+            <rect x="168" y={H-13} width="164" height="7" rx="3.5" fill="rgba(0,0,0,0.45)"/>
+            <rect x="168" y={H-13} width={164*(pw/100)} height="7" rx="3.5" fill={tc}/>
+          </>
+        )}
+
+        {/* Aim label */}
+        {(ph==="betting"||ph==="windup")&&sz!==null&&(
+          <>
+            <rect x="200" y={GL.bot+7} width="100" height="16" rx="8" fill={tc}/>
+            <text x="250" y={GL.bot+18} textAnchor="middle" fontSize="9" fill="white" fontWeight="900" letterSpacing="1.5">{"AIMING "+ZONES[sz].label+" "+ZONES[sz].arrow}</text>
+          </>
+        )}
+
+        {/* Cashout pot on pitch */}
+        {ph==="cto"&&pot>0&&(
+          <>
+            <rect x="174" y="138" width="152" height="24" rx="12" fill="rgba(0,0,0,0.88)" stroke={C.gold} strokeWidth="1.8"/>
+            <text x="250" y="154" textAnchor="middle" fontSize="12.5" fill={C.gold} fontWeight="900" letterSpacing="1">{"💰 POT: R"+pot}</text>
+          </>
+        )}
+
+        {/* Kick label top */}
+        <text x="250" y="13" textAnchor="middle" fontSize="7.5" fill="rgba(255,255,255,0.3)" letterSpacing="1.5">{kickerTeam.flag+" "+kickerTeam.name.toUpperCase()+"  —  KICK ? OF 5"}</text>
+      </g>
+
+      {/* Vignette */}
+      <rect x="0" y="0" width={W} height={H} fill="url(#vg)"/>
+    </svg>
+  );
+}
 export default function Penalty5(){
   const [intro,setIntro]=useState(true);
   const [scr,setScr]=useState("matchup");
@@ -242,13 +556,18 @@ export default function Penalty5(){
         </div>
       </div>
 
-      {/* ── PITCH (simple placeholder) ── */}
-      <div style={{width:"100%",maxWidth:520,height:200,background:"linear-gradient(180deg, #1A4A1A 0%, #0D2A0D 100%)",borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8,border:"1px solid "+C.bdr}}>
-        <div style={{textAlign:"center",color:"rgba(255,255,255,0.3)"}}>
-          <div style={{fontSize:48}}>⚽</div>
-          <div style={{fontSize:12,marginTop:8}}>Pitch Area</div>
-          <div style={{fontSize:10}}>3‑D coming soon</div>
-        </div>
+      {/* ── PITCH ── */}
+      <div style={{width:"100%",maxWidth:520,position:"relative",borderRadius:16,overflow:"hidden",marginBottom:8,border:"1px solid "+C.bdr}}>
+        <PitchSVG kickerTeam={kt} keeperTeam={kpt} ph={ph} sz={sz} kzone={kzone} anim={anim} bx={bx} by={by} pw={pw} pot={pot} rip={rip} />
+        {ph==="showing"&&out&&(
+          <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.76)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,borderRadius:16,zIndex:20}}>
+            <div style={{fontSize:52}}>{out.scored?"⚽":"🧤"}</div>
+            <div style={{fontSize:38,fontWeight:900,letterSpacing:5,color:out.scored?C.gold:C.mut,textShadow:"0 0 30px "+(out.scored?C.gold:C.mut)+"77"}}>{out.scored?"GOAL!":"SAVED!"}</div>
+            <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",textAlign:"center",maxWidth:"70%",lineHeight:1.6}}>{narr(out)}</div>
+            {out.scored&&<div style={{padding:"8px 22px",borderRadius:22,background:"rgba(255,215,0,0.18)",border:"1px solid "+C.gold,color:C.gold,fontWeight:800,fontSize:15}}>{"POT: R"+out.pot+" · "+MULTS[out.kn-1]+"x"}</div>}
+            {!out.scored&&<div style={{padding:"8px 22px",borderRadius:22,background:"rgba(232,69,60,0.18)",border:"1px solid "+C.red,color:C.red,fontWeight:800,fontSize:14}}>{"Pot lost · −R"+bet}</div>}
+          </div>
+        )}
       </div>
 
       {/* ── CONTROL PANEL ── */}
